@@ -1,20 +1,27 @@
-import { useEffect, useState } from 'react';
+import TopBar from './components/TopBar.jsx';
+import NewsList from './components/NewsList.jsx';
+import LaunchBar from './components/LaunchBar.jsx';
+import { player, game, news } from './data/launcher.js';
+import './App.css';
 
 function App() {
-  const [message, setMessage] = useState('Loading...');
-
-  useEffect(() => {
-    fetch('/api/health')
-      .then((res) => res.json())
-      .then((data) => setMessage(data.message))
-      .catch(() => setMessage('Backend connection failed'));
-  }, []);
-
   return (
-    <main>
-      <h1>React + Node.js</h1>
-      <p>{message}</p>
-    </main>
+    <div className="launcher">
+      <TopBar player={player} />
+
+      <main className="hero">
+        <section className="hero__content">
+          <span className="hero__season">{game.season}</span>
+          <h1 className="hero__title">{game.title}</h1>
+          <p className="hero__desc">{game.description}</p>
+          <button className="hero__link">패치노트 보기 →</button>
+        </section>
+
+        <NewsList items={news} />
+      </main>
+
+      <LaunchBar player={player} version={game.version} updateSize={game.updateSize} />
+    </div>
   );
 }
 

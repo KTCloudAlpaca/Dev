@@ -1,8 +1,37 @@
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
+:root {
+  /* 배경 · 표면 */
+  --bg: #0f1012;
+  --bg-raised: #151619;
+  --surface: #1b1c20;
+  --border: #2a2b30;
+
+  /* 텍스트 */
+  --text: #ece9e3;
+  --text-muted: #9a968e;
+  --text-faint: #65625c;
+
+  /* 강조색 (게임 시작 버튼 등 핵심 요소에만 사용) */
+  --accent: #e4572e;
+  --accent-hover: #ee6a43;
+  --on-accent: #140a06;
 }
 
-main {
-  padding: 2rem;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Pretendard', 'Malgun Gothic', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
 }
