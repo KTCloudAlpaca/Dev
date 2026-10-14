@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const LABELS = {
   ready: '게임 시작',
@@ -7,9 +7,15 @@ const LABELS = {
   error: '다시 시도',
 };
 
+// '게임 실행 중' 상태에서 다시 '게임 시작'으로 돌아오기까지의 시간
+const RESET_DELAY = 300;
+
 function LaunchBar({ version, updateSize }) {
   const [status, setStatus] = useState('ready');
+  const resetTimer = useRef();
   const canPlay = status === 'ready' || status === 'error';
+
+  useEffect(() => () => clearTimeout(resetTimer.current), []);
 
   const handlePlay = async () => {
     if (!canPlay) return;
@@ -19,6 +25,7 @@ function LaunchBar({ version, updateSize }) {
       const res = await fetch('/api/launch', { method: 'POST' });
       if (!res.ok) throw new Error(`Launch failed: ${res.status}`);
       setStatus('running');
+      resetTimer.current = setTimeout(() => setStatus('ready'), RESET_DELAY);
     } catch (err) {
       console.error(err);
       setStatus('error');
