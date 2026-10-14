@@ -14,6 +14,7 @@ Dev
 │   │   │   └── launch.js     # /api/launch 라우트
 │   │   └── index.js          # 서버 진입점
 │   ├── .env.example          # 환경변수 예시
+│   ├── Dockerfile
 │   └── package.json
 │
 ├── frontend/                 # React + Vite
@@ -30,7 +31,9 @@ Dev
 │   │   ├── index.css         # 전역 스타일
 │   │   └── main.jsx          # React 진입점
 │   ├── index.html
-│   ├── vite.config.js        # /api 요청을 backend로 프록시
+│   ├── vite.config.js        # (개발용) /api 요청을 backend로 프록시
+│   ├── nginx.conf.template   # (배포용) 정적 파일 서빙 + /api 프록시
+│   ├── Dockerfile
 │   └── package.json
 │
 └── .gitignore
