@@ -20,7 +20,7 @@ function App() {
         <NewsList items={news} />
       </main>
 
-      <LaunchBar player={player} version={game.version} updateSize={game.updateSize} />
+      <LaunchBar version={game.version} updateSize={game.updateSize} />
     </div>
   );
 }

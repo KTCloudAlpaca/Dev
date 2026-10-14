@@ -1,4 +1,4 @@
-export const player = 'Player01';
+export const player = 'User01';
 
 export const game = {
   title: 'ALPACA',

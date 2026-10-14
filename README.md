@@ -35,3 +35,38 @@ Dev
 │
 └── .gitignore
 ```
+
+## API
+
+| 메서드 | 경로 | 설명 |
+|---|---|---|
+| POST | `/api/launch` | 게임 시작 클릭 기록 |
+| GET | `/api/launch` | 누적 클릭 수 조회 |
+| GET | `/api/health` | 서버 상태 확인 |
+
+### POST `/api/launch`
+
+"게임 시작" 버튼을 누르면 호출됩니다. 요청 본문 없이 호출하며, 클릭 1회마다 MongoDB `launchlogs` 컬렉션에 클릭 시각(`createdAt`)이 담긴 문서 1개를 저장합니다.
+
+```json
+// 201 Created
+{ "id": "6acecf1ee9c83ea9d713e25f", "launchedAt": "2026-10-14T00:38:54.252Z" }
+```
+
+### GET `/api/launch`
+
+지금까지 저장된 클릭 기록의 총 개수를 반환합니다. 부하테스트 후 보낸 요청 수와 비교해 유실 여부를 확인하는 용도입니다.
+
+```json
+// 200 OK
+{ "total": 80 }
+```
+
+### GET `/api/health`
+
+서버가 실행 중인지 확인합니다. DB 연결 상태는 확인하지 않습니다.
+
+```json
+// 200 OK
+{ "status": "ok", "message": "Hello from backend!" }
+```

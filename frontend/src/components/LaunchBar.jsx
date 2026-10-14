@@ -7,7 +7,7 @@ const LABELS = {
   error: '다시 시도',
 };
 
-function LaunchBar({ player, version, updateSize }) {
+function LaunchBar({ version, updateSize }) {
   const [status, setStatus] = useState('ready');
   const canPlay = status === 'ready' || status === 'error';
 
@@ -16,11 +16,7 @@ function LaunchBar({ player, version, updateSize }) {
     setStatus('launching');
 
     try {
-      const res = await fetch('/api/launch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ player, version }),
-      });
+      const res = await fetch('/api/launch', { method: 'POST' });
       if (!res.ok) throw new Error(`Launch failed: ${res.status}`);
       setStatus('running');
     } catch (err) {
