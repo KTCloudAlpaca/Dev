@@ -13,6 +13,9 @@ spec:
       labels:
         app: frontend
     spec:
+      # worker 노드에만 배포
+      nodeSelector:
+        kubernetes.io/hostname: worker
       containers:
         - name: frontend
           image: launcher-frontend:v1

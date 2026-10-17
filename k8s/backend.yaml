@@ -13,6 +13,9 @@ spec:
       labels:
         app: backend
     spec:
+      # worker 노드에만 배포
+      nodeSelector:
+        kubernetes.io/hostname: worker
       containers:
         - name: backend
           image: launcher-backend:v1

@@ -109,7 +109,7 @@ docker exec -it launcher-mongo mongosh launcher    # 셸 접속
 
 ## k8s 배포
 
-매니페스트는 `k8s/`에 있습니다. 서버에서 레포를 clone한 뒤 직접 이미지를 빌드해 배포합니다.
+매니페스트는 `k8s/`에 있습니다. master 노드에서 레포를 clone해 이미지를 빌드하고, Pod는 `nodeSelector`로 worker 노드에만 배포합니다.
 
 | 파일 | 내용 |
 |---|---|
@@ -122,11 +122,13 @@ docker exec -it launcher-mongo mongosh launcher    # 셸 접속
 docker build -t launcher-backend:v1 ./backend
 docker build -t launcher-frontend:v1 ./frontend
 
-# k8s 런타임(containerd)으로 이미지 전달
-docker save launcher-backend:v1 launcher-frontend:v1 | sudo ctr -n k8s.io images import -
+# tar로 저장해 worker 노드로 복사한 뒤 containerd에 import
+docker save launcher-backend:v1 launcher-frontend:v1 -o launcher-images.tar
+scp launcher-images.tar student@<worker IP>:~/
+ssh student@<worker IP> 'sudo ctr -n k8s.io images import ~/launcher-images.tar'
 ```
 
-이미지는 빌드한 노드에만 있으므로, 노드가 여러 대라면 모든 노드에서 import하거나 레지스트리에 push해야 합니다.
+Pod는 worker에서만 실행되므로 이미지도 worker에만 있으면 됩니다. worker IP는 `kubectl get nodes -o wide`의 `INTERNAL-IP`로 확인합니다.
 
 ### 2. Secret 생성
 
