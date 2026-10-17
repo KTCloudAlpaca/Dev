@@ -113,7 +113,6 @@ docker exec -it launcher-mongo mongosh launcher    # 셸 접속
 
 | 파일 | 내용 |
 |---|---|
-| `namespace.yaml` | `launcher` 네임스페이스 |
 | `backend.yaml` | backend Deployment + Service (`backend:5000`) |
 | `frontend.yaml` | frontend Deployment + Service (NodePort `30080`) |
 
@@ -134,8 +133,7 @@ docker save launcher-backend:v1 launcher-frontend:v1 | sudo ctr -n k8s.io images
 MongoDB(`db` 네임스페이스의 `mongodb` 서비스)는 인증이 걸려 있어, 접속 주소를 Secret으로 넣습니다. 계정 정보가 들어 있으므로 git에는 올리지 않습니다.
 
 ```bash
-kubectl apply -f k8s/namespace.yaml
-kubectl create secret generic backend-secret -n launcher \
+kubectl create secret generic backend-secret -n app \
   --from-literal=MONGODB_URI='mongodb://<user>:<password>@mongodb.db.svc.cluster.local:27017/launcher?authSource=admin'
 ```
 
@@ -147,13 +145,13 @@ frontend nginx는 시작할 때 `backend` 주소를 찾으므로 backend를 먼�
 kubectl apply -f k8s/backend.yaml
 kubectl apply -f k8s/frontend.yaml
 
-kubectl get pods -n launcher
-kubectl logs -n launcher deploy/backend   # "MongoDB connected" 확인
+kubectl get pods -n app
+kubectl logs -n app deploy/backend   # "MongoDB connected" 확인
 ```
 
 `http://<노드 IP>:30080`으로 접속합니다. 외부에서 접속하려면 보안 그룹에서 `30080` 포트를 열어야 합니다.
 
-코드를 수정한 뒤에는 이미지를 다시 빌드·import하고 `kubectl rollout restart -n launcher deploy/backend`(또는 `frontend`)로 재시작합니다.
+코드를 수정한 뒤에는 이미지를 다시 빌드·import하고 `kubectl rollout restart -n app deploy/backend`(또는 `frontend`)로 재시작합니다.
 
 ## API
 
