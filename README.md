@@ -36,6 +36,7 @@ Dev
 │   ├── Dockerfile
 │   └── package.json
 │
+├── k8s/                      # (배포용) k8s 매니페스트
 ├── docker-compose.yml        # (개발용) 로컬 MongoDB
 └── .gitignore
 ```
@@ -105,6 +106,54 @@ docker exec -it launcher-mongo mongosh launcher    # 셸 접속
 ### 문제 해결
 
 - **`[vite] http proxy error: /api/launch ... ECONNREFUSED`**: 백엔드가 떠 있지 않은 상태입니다. 백엔드 터미널에 `Server running` 로그가 있는지 확인하세요. 없다면 MongoDB 컨테이너가 실행 중인지(`docker ps`), `MONGODB_URI`가 올바른지 확인합니다.
+
+## k8s 배포
+
+매니페스트는 `k8s/`에 있습니다. 서버에서 레포를 clone한 뒤 직접 이미지를 빌드해 배포합니다.
+
+| 파일 | 내용 |
+|---|---|
+| `namespace.yaml` | `launcher` 네임스페이스 |
+| `backend.yaml` | backend Deployment + Service (`backend:5000`) |
+| `frontend.yaml` | frontend Deployment + Service (NodePort `30080`) |
+
+### 1. 이미지 빌드
+
+```bash
+docker build -t launcher-backend:v1 ./backend
+docker build -t launcher-frontend:v1 ./frontend
+
+# k8s 런타임(containerd)으로 이미지 전달
+docker save launcher-backend:v1 launcher-frontend:v1 | sudo ctr -n k8s.io images import -
+```
+
+이미지는 빌드한 노드에만 있으므로, 노드가 여러 대라면 모든 노드에서 import하거나 레지스트리에 push해야 합니다.
+
+### 2. Secret 생성
+
+MongoDB(`db` 네임스페이스의 `mongodb` 서비스)는 인증이 걸려 있어, 접속 주소를 Secret으로 넣습니다. 계정 정보가 들어 있으므로 git에는 올리지 않습니다.
+
+```bash
+kubectl apply -f k8s/namespace.yaml
+kubectl create secret generic backend-secret -n launcher \
+  --from-literal=MONGODB_URI='mongodb://<user>:<password>@mongodb.db.svc.cluster.local:27017/launcher?authSource=admin'
+```
+
+### 3. 배포
+
+frontend nginx는 시작할 때 `backend` 주소를 찾으므로 backend를 먼저 배포합니다.
+
+```bash
+kubectl apply -f k8s/backend.yaml
+kubectl apply -f k8s/frontend.yaml
+
+kubectl get pods -n launcher
+kubectl logs -n launcher deploy/backend   # "MongoDB connected" 확인
+```
+
+`http://<노드 IP>:30080`으로 접속합니다. 외부에서 접속하려면 보안 그룹에서 `30080` 포트를 열어야 합니다.
+
+코드를 수정한 뒤에는 이미지를 다시 빌드·import하고 `kubectl rollout restart -n launcher deploy/backend`(또는 `frontend`)로 재시작합니다.
 
 ## API
 
