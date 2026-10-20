@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: myapp-monitor
+  namespace: monitor # 프로메테우스가 있는 네임스페이스에 생성하는 것이 일반적입니다.
+  labels:
+    release: mymonitor # 프로메테우스(kube-prometheus-stack)가 이 라벨이 있는 ServiceMonitor 만 수집
+spec:
+  selector:
+    matchLabels:
+      app: backend # 앱 Service의 라벨
+  namespaceSelector:
+    matchNames:
+      - app # <-- 앱이 존재하는 네임스페이스를 지정!
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s

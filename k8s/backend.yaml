@@ -18,7 +18,7 @@ spec:
         kubernetes.io/hostname: worker
       containers:
         - name: backend
-          image: launcher-backend:v1
+          image: launcher-backend:v2
           # 서버에서 직접 빌드한 이미지를 쓰므로 레지스트리에서 받지 않는다
           imagePullPolicy: IfNotPresent
           ports:
@@ -59,9 +59,12 @@ kind: Service
 metadata:
   name: backend
   namespace: app
+  labels:
+    app: backend # ServiceMonitor(myapp-monitor) 가 이 라벨로 찾음
 spec:
   selector:
     app: backend
   ports:
-    - port: 5000
+    - name: http # ServiceMonitor 가 포트 이름으로 수집
+      port: 5000
       targetPort: 5000
