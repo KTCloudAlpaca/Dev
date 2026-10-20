@@ -18,7 +18,7 @@ spec:
         kubernetes.io/hostname: worker
       containers:
         - name: backend
-          image: launcher-backend:v2
+          image: launcher-backend:v3
           # 서버에서 직접 빌드한 이미지를 쓰므로 레지스트리에서 받지 않는다
           imagePullPolicy: IfNotPresent
           ports:

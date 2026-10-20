@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { connectDB } from './config/db.js';
 import launchRouter from './routes/launch.js';
+import drReadyRouter from './routes/drReady.js';
 import { register, metricsMiddleware } from './config/metrics.js';
 
 const app = express();
@@ -17,6 +18,8 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/launch', launchRouter);
+
+app.use('/api/dr-ready', drReadyRouter);
 
 // Prometheus 수집용
 app.get('/metrics', async (req, res) => {
